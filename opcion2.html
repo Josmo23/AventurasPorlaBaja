@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ruleta de Premios - Tours Aventuras por la Baja</title>
+    <!-- Agregar fuentes de Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+:root {
+        --neon-pink: #ff00ff;
+        --neon-blue: #00ffff;
+        --neon-green: #00ff00;
+        --neon-yellow: #ffff00;
+        --neon-orange: #ff8800;
+        --tropical-green: #00ffa3;
+        --tropical-blue: #00c3ff;
+        --tropical-pink: #ff5bff;
+        --tropical-yellow: #ffdd00;
+    }
+    
+    body {
+        font-family: 'Orbitron', 'Montserrat', sans-serif;
+        background-color: #0c0c2a;
+        background-image: 
+            radial-gradient(circle at 10% 20%, rgba(0, 255, 163, 0.1) 0%, transparent 20%),
+            radial-gradient(circle at 90% 30%, rgba(0, 195, 255, 0.1) 0%, transparent 20%),
+            radial-gradient(circle at 50% 80%, rgba(255, 91, 255, 0.1) 0%, transparent 20%);
+        color: white;
+        overflow-x: hidden;
+        user-select: none;
+    }
+    
+    .neon-text {
+        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px var(--tropical-pink), 
+                     0 0 20px var(--tropical-pink), 0 0 25px var(--tropical-pink);
+        animation: neon-glow 1.5s ease-in-out infinite alternate;
+    }
+    
+    .neon-text-blue {
+        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px var(--tropical-blue), 
+                     0 0 20px var(--tropical-blue), 0 0 25px var(--tropical-blue);
+        animation: neon-glow-blue 1.5s ease-in-out infinite alternate;
+    }
+    
+    .neon-border {
+        box-shadow: 0 0 5px var(--tropical-pink), 0 0 10px var(--tropical-pink), 
+                    0 0 15px var(--tropical-pink), 0 0 20px var(--tropical-pink);
+        animation: neon-border-glow 1.5s ease-in-out infinite alternate;
+    }
+    
+    @keyframes neon-glow {
+        from {
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px var(--tropical-pink), 
+                         0 0 20px var(--tropical-pink), 0 0 25px var(--tropical-pink);
+        }
+        to {
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px var(--tropical-blue), 
+                         0 0 20px var(--tropical-blue), 0 0 25px var(--tropical-blue);
+        }
+    }
+    
+    @keyframes neon-glow-blue {
+        from {
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px var(--tropical-blue), 
+                         0 0 20px var(--tropical-blue), 0 0 25px var(--tropical-blue);
+        }
+        to {
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px var(--tropical-green), 
+                         0 0 20px var(--tropical-green), 0 0 25px var(--tropical-green);
+        }
+    }
+    
+    @keyframes neon-border-glow {
+        from {
+            box-shadow: 0 0 5px var(--tropical-pink), 0 0 10px var(--tropical-pink), 
+                        0 0 15px var(--tropical-pink), 0 0 20px var(--tropical-pink);
+        }
+        to {
+            box-shadow: 0 0 5px var(--tropical-blue), 0 0 10px var(--tropical-blue), 
+                        0 0 15px var(--tropical-blue), 0 0 20px var(--tropical-blue);
+        }
+    }
+    
+    /* Increased wheel size by 20% */
+    .wheel-container {
+        position: relative;
+        width: 480px; /* Increased from 400px */
+        height: 480px; /* Increased from 400px */
+        margin: 0 auto;
+    }
+    
+    .wheel {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        border-radius: 50%;
+        overflow: hidden;
+        transition: transform 5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        transform: rotate(0deg);
+        box-shadow: 
+            0 0 20px var(--tropical-blue),
+            0 0 40px var(--tropical-blue),
+            inset 0 0 20px rgba(255, 255, 255, 0.2);
+        border: 5px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .wheel-section {
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        transform-origin: bottom right;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: white;
+    }
+    
+    /* Improved emoji positioning in wheel sections */
+    .wheel-emoji {
+        position: absolute;
+        font-size: 60px;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* Position the emoji in the center of each triangle */
+        left: 40%;
+        top: 40%;
+        transform: translate(-50%, -50%) rotate(60deg);
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+    }
+    
+    .wheel-arrow {
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 25px solid transparent;
+        border-right: 25px solid transparent;
+        border-top: 35px solid var(--tropical-yellow);
+        z-index: 10;
+        filter: drop-shadow(0 0 10px var(--tropical-yellow));
+    }
+    
+    .wheel-outer-ring {
+        position: absolute;
+        top: -15px;
+        left: -15px;
+        right: -15px;
+        bottom: -15px;
+        border-radius: 50%;
+        border: 15px solid transparent;
+        background: linear-gradient(45deg, var(--tropical-pink), var(--tropical-blue), var(--tropical-green), var(--tropical-yellow)) border-box;
+        -webkit-mask: 
+            linear-gradient(#fff 0 0) padding-box, 
+            linear-gradient(#fff 0 0);
+        -webkit-mask-composite: destination-out;
+        mask-composite: exclude;
+        animation: rotate 10s linear infinite;
+        opacity: 0.8;
+        z-index: -1;
+    }
+    
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .prize-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .prize-item {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 10px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .prize-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        border-color: var(--tropical-blue);
+    }
+    
+    .prize-emoji {
+        font-size: 24px;
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    }
+    
+    .btn {
+        background: linear-gradient(45deg, var(--tropical-pink), var(--tropical-blue));
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 50px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: 0 0 15px rgba(0, 195, 255, 0.7);
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .btn:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: 0.5s;
+        z-index: -1;
+    }
+    
+    .btn:hover:before {
+        left: 100%;
+    }
+    
+    .btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(0, 195, 255, 0.9);
+    }
+    
+    .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    input, select {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 14px;
+        border-radius: 50px;
+        width: 100%;
+        margin-bottom: 15px;
+        backdrop-filter: blur(10px);
+        font-family: 'Montserrat', sans-serif;
+        letter-spacing: 1px;
+    }
+    
+    input:focus, select:focus {
+        outline: none;
+        border-color: var(--tropical-blue);
+        box-shadow: 0 0 10px var(--tropical-blue);
+    }
+    
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+        backdrop-filter: blur(10px);
+    }
+    
+    .modal.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+    
+    .modal-content {
+        background: linear-gradient(135deg, #0c0c2a, #1a1a4a);
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 550px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        border: 2px solid var(--tropical-pink);
+        box-shadow: 0 0 30px var(--tropical-pink);
+    }
+    
+    .close-modal {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 28px;
+        cursor: pointer;
+        color: white;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .close-modal:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: rotate(90deg);
+    }
+    
+    .winner-card {
+        background: linear-gradient(45deg, rgba(255, 91, 255, 0.2), rgba(0, 195, 255, 0.2));
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+    
+    .winner-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        border-color: var(--tropical-blue);
+    }
+    
+    .winner-emoji {
+        font-size: 50px;
+        margin-left: 15px;
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    }
+    
+    @media (max-width: 768px) {
+        .wheel-container {
+            width: 360px; /* Smaller for mobile but still 20% larger than original mobile size */
+            height: 360px;
+        }
+        
+        .wheel-emoji {
+            font-size: 48px;
+            width: 48px;
+            height: 48px;
+        }
+        
+        .prize-list {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+    
+    .footer {
+        margin-top: 70px;
+        padding: 30px;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.3);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .footer:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, 
+            transparent, 
+            var(--tropical-pink), 
+            var(--tropical-blue), 
+            var(--tropical-green), 
+            transparent);
+        animation: gradient-move 3s linear infinite;
+    }
+    
+    @keyframes gradient-move {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 100% 50%; }
+    }
+    
+    /* Anti-copy protection */
+    body {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    
+    /* Print styles */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        
+        #printSection, #printSection * {
+            visibility: visible;
+        }
+        
+        #printSection {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+    }
+    
+    /* Loading screen */
+    .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0c0c2a, #1a1a4a);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        transition: opacity 0.5s ease-out;
+    }
+    
+    .loading-spinner {
+        width: 100px;
+        height: 100px;
+        border: 10px solid rgba(255, 91, 255, 0.3);
+        border-radius: 50%;
+        border-top: 10px solid var(--tropical-pink);
+        animation: spin 1s linear infinite;
+        margin-bottom: 30px;
+        box-shadow: 0 0 20px var(--tropical-pink);
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .folio-badge {
+        background: linear-gradient(45deg, var(--tropical-pink), var(--tropical-blue));
+        color: white;
+        padding: 8px 16px;
+        border-radius: 30px;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 15px;
+        box-shadow: 0 0 15px rgba(0, 195, 255, 0.7);
+        letter-spacing: 2px;
+        font-size: 18px;
+    }
+    
+    .view-transition {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    
+    .view-transition.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* Tropical elements */
+    .palm-tree {
+        position: absolute;
+        font-size: 80px;
+        opacity: 0.2;
+        filter: drop-shadow(0 0 10px rgba(0, 255, 163, 0.5));
+        animation: sway 5s ease-in-out infinite alternate;
+        z-index: -1;
+    }
+    
+    .palm-tree-left {
+        top: 100px;
+        left: 5%;
+        transform-origin: bottom center;
+    }
+    
+    .palm-tree-right {
+        top: 150px;
+        right: 5%;
+        transform-origin: bottom center;
+    }
+    
+    @keyframes sway {
+        0% { transform: rotate(-5deg); }
+        100% { transform: rotate(5deg); }
+    }
+    
+    .tropical-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2;
+        pointer-events: none;
+        opacity: 0.1;
+    }
+    
+    .wave {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z' opacity='.25' fill='%2300FFA3'%3E%3C/path%3E%3Cpath d='M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z' opacity='.5' fill='%2300C3FF'%3E%3C/path%3E%3Cpath d='M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z' fill='%23FF5BFF'%3E%3C/path%3E%3C/svg%3E");
+        background-size: cover;
+        background-repeat: no-repeat;
+        animation: wave 15s linear infinite;
+    }
+    
+    @keyframes wave {
+        0% { background-position-x: 0; }
+        100% { background-position-x: 1000px; }
+    }
+    
+    .recent-winners {
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .recent-winners:hover {
+        border-color: var(--tropical-blue);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Futuristic elements */
+    .futuristic-circle {
+        position: absolute;
+        border-radius: 50%;
+        border: 2px solid rgba(0, 195, 255, 0.3);
+        animation: pulse 3s infinite alternate;
+    }
+    
+    .circle-1 {
+        width: 200px;
+        height: 200px;
+        top: 10%;
+        left: 10%;
+        border-color: rgba(255, 91, 255, 0.3);
+        animation-delay: 0s;
+    }
+    
+    .circle-2 {
+        width: 300px;
+        height: 300px;
+        bottom: 10%;
+        right: 10%;
+        border-color: rgba(0, 255, 163, 0.3);
+        animation-delay: 1s;
+    }
+    
+    .circle-3 {
+        width: 150px;
+        height: 150px;
+        top: 40%;
+        right: 20%;
+        border-color: rgba(255, 221, 0, 0.3);
+        animation-delay: 2s;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.3; }
+        100% { transform: scale(1.1); opacity: 0.1; }
+    }
+    
+    /* Enhanced registration form */
+    .registration-form {
+        background: linear-gradient(135deg, rgba(12, 12, 42, 0.7), rgba(26, 26, 74, 0.7));
+        border-radius: 30px;
+        padding: 30px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .registration-form:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        border-color: var(--tropical-blue);
+    }
+    
+    .registration-form:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, 
+            var(--tropical-pink), 
+            var(--tropical-blue), 
+            var(--tropical-green), 
+            var(--tropical-yellow));
+        z-index: 1;
+    }
+    
+    .form-group {
+        position: relative;
+        margin-bottom: 25px;
+    }
+    
+    .form-group label {
+        position: absolute;
+        left: 20px;
+        top: 14px;
+        color: rgba(255, 255, 255, 0.7);
+        transition: all 0.3s ease;
+        pointer-events: none;
+        font-size: 14px;
+    }
+    
+    .form-group input:focus + label,
+    .form-group input:not(:placeholder-shown) + label {
+        top: -10px;
+        left: 10px;
+        font-size: 12px;
+        color: var(--tropical-blue);
+        background: rgba(12, 12, 42, 0.8);
+        padding: 0 8px;
+        border-radius: 10px;
+    }
+    
+    .form-group input {
+        padding-top: 20px;
+        padding-bottom: 10px;
+    }
+    
+    /* Prize chips */
+    .prize-chips {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 30px;
+    }
+    
+    .prize-chip {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50px;
+        padding: 8px 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+    
+    .prize-chip:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        border-color: var(--tropical-blue);
+        background: rgba(255, 255, 255, 0.15);
+    }
+    
+    .prize-chip-emoji {
+        font-size: 18px;
+    }
+    
+    /* Decorative elements */
+    .decorative-star {
+        position: absolute;
+        font-size: 20px;
+        color: white;
+        opacity: 0.3;
+        animation: twinkle 3s infinite alternate;
+        z-index: -1;
+    }
+    
+    @keyframes twinkle {
+        0% { opacity: 0.1; transform: scale(0.8); }
+        100% { opacity: 0.4; transform: scale(1); }
+    }
+    
+    /* Prize list on the left */
+    .prize-list-sidebar {
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        margin-right: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .prize-list-sidebar:hover {
+        border-color: var(--tropical-blue);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .prize-list-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .prize-list-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+    }
+    
+    .prize-list-emoji {
+        font-size: 30px;
+        margin-right: 15px;
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    }
+    
+    /* Home prizes list */
+    .home-prizes-list {
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .home-prizes-list:hover {
+        border-color: var(--tropical-blue);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .home-prize-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 15px;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .home-prize-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+    }
+    
+    .home-prize-emoji {
+        font-size: 40px;
+        margin-right: 20px;
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    }
+    
+    .home-prize-details {
+        flex: 1;
+    }
+    
+    .home-prize-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    /* Phone input validation styles */
+    .input-error {
+        border-color: #ff5bff !important;
+        box-shadow: 0 0 10px #ff5bff !important;
+    }
+    
+    .error-message {
+        color: #ff5bff;
+        font-size: 12px;
+        margin-top: -10px;
+        margin-bottom: 10px;
+        padding-left: 15px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .error-message.visible {
+        opacity: 1;
+    }
+    
+    /* Thank you modal enhancements */
+    .thank-you-card {
+        background: linear-gradient(45deg, rgba(255, 91, 255, 0.2), rgba(0, 195, 255, 0.2));
+        border-radius: 20px;
+        padding: 25px;
+        margin: 20px 0;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .thank-you-prize {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 30px 0;
+    }
+    
+    .thank-you-prize-emoji {
+        font-size: 80px;
+        margin-right: 20px;
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7));
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+    
+    .thank-you-info {
+        margin-bottom: 5px;
+        font-size: 18px;
+    }
+    
+    .thank-you-info strong {
+        color: var(--tropical-yellow);
+        font-weight: bold;
+    }
+    
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: var(--tropical-pink);
+        opacity: 0.8;
+        animation: confetti-fall 5s linear infinite;
+    }
+    
+    @keyframes confetti-fall {
+        0% { transform: translateY(-100vh) rotate(0deg); }
+        100% { transform: translateY(100vh) rotate(360deg); }
+    }
+	/* Correcciones generales */
+body {
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    padding: 0 15px;
+}
+
+/* Ruleta responsiva */
+@media (max-width: 480px) {
+    .wheel-container {
+        width: 300px !important;
+        height: 300px !important;
+    }
+    .wheel-emoji {
+        font-size: 40px !important;
+    }
+}
+
+/* Textos en premios */
+.home-prize-name, .prize-list-item span {
+    word-break: break-word;
+    white-space: normal;
+}
+
+/* Modal en móviles */
+.modal-content {
+    width: 95% !important;
+    padding: 20px !important;
+}
+.recent-winners {
+    max-width: 400px; /* Ancho reducido */
+    margin: 0 auto; /* Centrar */
+    padding: 15px !important; /* Menos espacio interno */
+}
+
+.winner-card {
+    padding: 12px !important; /* Menos espacio en la tarjeta */
+}
+
+.winner-emoji {
+    font-size: 30px !important; /* Emoji más pequeño */
+}
+</style>
+</head>
+<body>
+<div class="palm-tree palm-tree-left">🌴</div>
+<div class="palm-tree palm-tree-right">🌴</div>
+
+<div class="futuristic-circle circle-1"></div>
+<div class="futuristic-circle circle-2"></div>
+<div class="futuristic-circle circle-3"></div>
+
+<!-- Decorative stars -->
+<div class="decorative-star" style="top: 15%; left: 25%;">✨</div>
+<div class="decorative-star" style="top: 35%; left: 85%;">✨</div>
+<div class="decorative-star" style="top: 65%; left: 15%;">✨</div>
+<div class="decorative-star" style="top: 75%; left: 75%;">✨</div>
+<div class="decorative-star" style="top: 25%; left: 45%;">✨</div>
+
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+    <div class="loading-spinner"></div>
+    <h2 class="text-2xl font-bold neon-text mb-4">Cargando...</h2>
+    <p>Tours Aventuras por la Baja</p>
+</div>
+
+<div class="container mx-auto px-4 py-8">
+    <header class="text-center mb-12">
+        <h1 class="text-5xl md:text-7xl font-black mb-4 neon-text">RULETA DE PREMIOS</h1>
+        <h2 class="text-xl md:text-3xl neon-text-blue">Tours Aventuras por la Baja</h2>
+    </header>
+    
+    <div class="recent-winners p-4 rounded-lg mb-8"> <!-- Reducir padding -->
+    <h3 class="text-xl font-bold mb-4 text-center">Último Ganador</h3> <!-- Título más pequeño -->
+    <div id="recentWinnersList" class="space-y-3">
+        <p class="text-center text-gray-400" id="noWinnersMessage">Aún no hay ganadores</p>
+    </div>
+</div>
+</div>
+    
+    <!-- Registration View - Rearranged with prizes on left, form on right -->
+    <div id="registrationView" class="view-transition active">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Prizes List on the Left -->
+            <div class="md:w-1/2">
+                <div class="home-prizes-list">
+                    <h3 class="text-2xl font-bold mb-6 text-center">Premios Disponibles</h3>
+                    
+                    <div class="home-prize-item">
+                        <div class="home-prize-emoji">🎟️</div>
+                        <div class="home-prize-details">
+                            <div class="home-prize-name">Sigue Participando</div>
+                        </div>
+                    </div>
+                    
+                    <div class="home-prize-item">
+                        <div class="home-prize-emoji">🏷️</div>
+                        <div class="home-prize-details">
+                            <div class="home-prize-name">10% de Descuento</div>
+                        </div>
+                    </div>
+                    
+                    <div class="home-prize-item">
+                        <div class="home-prize-emoji">🍷</div>
+                        <div class="home-prize-details">
+                            <div class="home-prize-name">Vino Gratis</div>
+                        </div>
+                    </div>
+                    
+                    <div class="home-prize-item">
+                        <div class="home-prize-emoji">⛵</div>
+                        <div class="home-prize-details">
+                            <div class="home-prize-name">Viaje en Barco</div>
+                        </div>
+                    </div>
+                    
+                    <div class="home-prize-item">
+                        <div class="home-prize-emoji">💰</div>
+                        <div class="home-prize-details">
+                            <div class="home-prize-name">100 Pesos de Descuento</div>
+                        </div>
+                    </div>
+                    
+                    <div class="home-prize-item">
+                        <div class="home-prize-emoji">✈️</div>
+                        <div class="home-prize-details">
+                            <div class="home-prize-name">Viaje Gratis</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Registration Form on the Right -->
+            <div class="md:w-1/2">
+                <div id="registrationForm" class="registration-form mb-8">
+                    <h3 class="text-2xl font-bold mb-6 text-center">Registra tus datos para participar</h3>
+                    <div class="form-group">
+                        <input type="text" id="fullName" placeholder=" " required>
+                        <label for="fullName">Nombre Completo</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" id="phone" placeholder=" " required maxlength="10">
+                        <label for="phone">Número de Teléfono</label>
+                    </div>
+                    <div id="phoneError" class="error-message">Solo se permiten números (máximo 10 dígitos)</div>
+                    <button id="registerBtn" class="btn w-full text-lg">Registrar y Jugar</button>
+                </div>
+                
+                <div class="mt-8 text-center">
+                    <button id="adminBtn" class="btn bg-gray-700 hover:bg-gray-600">Administrador</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        
+    <!-- Wheel View -->
+    <div id="wheelView" class="view-transition">
+        <div class="flex flex-col md:flex-row">
+            <!-- Prize list on the left -->
+            <div class="prize-list-sidebar md:w-1/3 mb-6 md:mb-0">
+                <h4 class="text-lg font-bold mb-4 text-center">Premios</h4>
+                <div id="prizeSidebar">
+                    <div class="prize-list-item">
+                        <span class="prize-list-emoji">🎟️</span>
+                        <span>Sigue Participando</span>
+                    </div>
+                    <div class="prize-list-item">
+                        <span class="prize-list-emoji">🏷️</span>
+                        <span>10% de Descuento</span>
+                    </div>
+                    <div class="prize-list-item">
+                        <span class="prize-list-emoji">🍷</span>
+                        <span>Vino Gratis</span>
+                    </div>
+                    <div class="prize-list-item">
+                        <span class="prize-list-emoji">⛵</span>
+                        <span>Viaje en Barco</span>
+                    </div>
+                    <div class="prize-list-item">
+                        <span class="prize-list-emoji">💰</span>
+                        <span>100 Pesos</span>
+                    </div>
+                    <div class="prize-list-item">
+                        <span class="prize-list-emoji">✈️</span>
+                        <span>Viaje Gratis</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Wheel on the right -->
+            <div class="md:w-2/3">
+                <div class="text-center mb-6">
+                    <div class="folio-badge" id="folioDisplay">Folio: 0000</div>
+                </div>
+                
+                <div class="wheel-container">
+                    <div class="wheel-outer-ring"></div>
+                    <div class="wheel" id="wheel">
+                        <!-- Wheel sections will be generated by JavaScript -->
+                    </div>
+                    <div class="wheel-arrow"></div>
+                </div>
+                
+                <div class="text-center mt-8">
+                    <button id="spinBtn" class="btn text-lg">¡Girar la Ruleta!</button>
+                </div>
+                
+                <div id="resultContainer" class="mt-8 text-center hidden">
+                    <h3 class="text-3xl font-bold mb-4">¡Felicidades!</h3>
+                    <p class="text-2xl">Has ganado: <span id="prizeResult" class="font-bold text-yellow-300"></span></p>
+                    <div class="mt-6">
+                        <button id="newPlayerBtn" class="btn text-lg">Nuevo Participante</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p class="text-2xl font-bold neon-text">Tours Aventuras por la Baja</p>
+    <p class="mt-3 text-sm text-gray-400">© 2023 Todos los derechos reservados</p>
+</footer>
+
+<!-- Admin Login Modal -->
+<div id="adminModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeAdminModal">&times;</span>
+        <h2 class="text-3xl font-bold mb-6">Acceso Administrador</h2>
+        <div class="form-group">
+            <input type="text" id="adminUsername" placeholder=" ">
+            <label for="adminUsername">Usuario</label>
+        </div>
+        <div class="form-group">
+            <input type="password" id="adminPassword" placeholder=" ">
+            <label for="adminPassword">Contraseña</label>
+        </div>
+        <button id="adminLoginBtn" class="btn w-full text-lg">Ingresar</button>
+    </div>
+</div>
+
+<!-- Admin Panel Modal -->
+<div id="adminPanelModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeAdminPanelModal">&times;</span>
+        <h2 class="text-3xl font-bold mb-6">Panel de Administrador</h2>
+        <div class="mb-6">
+            <button id="printListBtn" class="btn w-full mb-4 text-lg">Imprimir Lista de Participantes</button>
+            <button id="clearDataBtn" class="btn bg-red-600 hover:bg-red-700 w-full text-lg">Borrar Todos los Datos</button>
+        </div>
+        <div id="printSection">
+            <h3 class="text-2xl font-bold mb-6">Lista de Participantes</h3>
+            <div id="participantsList" class="space-y-3">
+                <!-- Participants will be listed here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thank You Modal - Enhanced with participant details -->
+<div id="thankYouModal" class="modal">
+    <div class="modal-content text-center">
+        <h2 class="text-4xl font-bold mb-4 neon-text">¡Gracias por Participar!</h2>
+        <p class="text-xl mb-4">Tours Aventuras por la Baja agradece tu participación</p>
+        
+        <!-- Confetti container -->
+        <div id="confettiContainer" class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none"></div>
+        
+        <!-- Participant details card -->
+        <div class="thank-you-card">
+            <h3 class="text-2xl font-bold mb-3">Datos del Participante</h3>
+            <div class="thank-you-info"><strong>Nombre:</strong> <span id="thankYouName"></span></div>
+            <div class="thank-you-info"><strong>Teléfono:</strong> <span id="thankYouPhone"></span></div>
+            <div class="thank-you-info"><strong>Folio:</strong> <span id="thankYouFolio"></span></div>
+            
+            <div class="thank-you-prize">
+                <div id="thankYouPrizeEmoji" class="thank-you-prize-emoji">🎁</div>
+                <div>
+                    <div class="text-lg">Tu premio es:</div>
+                    <div id="thankYouPrize" class="text-3xl font-bold text-yellow-300">Premio</div>
+                </div>
+            </div>
+        </div>
+        
+        <p class="text-lg mt-6 mb-6">¡Presenta este folio para reclamar tu premio!</p>
+        <button id="closeThankYouModal" class="btn text-lg">Cerrar</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Prevent right-click
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        
+        // Prevent keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && 
+                (e.key === 'c' || e.key === 'u' || e.key === 's' || e.key === 'p' || e.key === 'a')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        // Hide loading screen after a short delay
+        setTimeout(() => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 500);
+        }, 1500);
+        
+        // Define prizes with their probabilities and emojis
+        const prizes = [
+            { name: "Sigue Participando", probability: 0.77, emoji: "🎟️", color: "linear-gradient(135deg, #FF3366, #FF6699)" },
+            { name: "10% de Descuento", probability: 0.05, emoji: "🏷️", color: "linear-gradient(135deg, #33FF99, #00CC66)" },
+            { name: "Vino Gratis", probability: 0.05, emoji: "🍷", color: "linear-gradient(135deg, #9933FF, #6600CC)" },
+            { name: "Viaje en Barco", probability: 0.05, emoji: "⛵", color: "linear-gradient(135deg, #3366FF, #0033CC)" },
+            { name: "100 Pesos de Descuento", probability: 0.05, emoji: "💰", color: "linear-gradient(135deg, #FFCC33, #FF9900)" },
+            { name: "Viaje Gratis", probability: 0.03, emoji: "✈️", color: "linear-gradient(135deg, #FF66CC, #CC33FF)" }
+        ];
+        
+        // Elements
+        const registrationView = document.getElementById('registrationView');
+        const wheelView = document.getElementById('wheelView');
+        const wheel = document.getElementById('wheel');
+        const spinBtn = document.getElementById('spinBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const fullNameInput = document.getElementById('fullName');
+        const phoneInput = document.getElementById('phone');
+        const phoneError = document.getElementById('phoneError');
+        const resultContainer = document.getElementById('resultContainer');
+        const prizeResult = document.getElementById('prizeResult');
+        const newPlayerBtn = document.getElementById('newPlayerBtn');
+        const adminBtn = document.getElementById('adminBtn');
+        const adminModal = document.getElementById('adminModal');
+        const closeAdminModal = document.getElementById('closeAdminModal');
+        const adminLoginBtn = document.getElementById('adminLoginBtn');
+        const adminPanelModal = document.getElementById('adminPanelModal');
+        const closeAdminPanelModal = document.getElementById('closeAdminPanelModal');
+        const printListBtn = document.getElementById('printListBtn');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        const participantsList = document.getElementById('participantsList');
+        const thankYouModal = document.getElementById('thankYouModal');
+        const closeThankYouModal = document.getElementById('closeThankYouModal');
+        const recentWinnersList = document.getElementById('recentWinnersList');
+        const noWinnersMessage = document.getElementById('noWinnersMessage');
+        const folioDisplay = document.getElementById('folioDisplay');
+        
+        // Thank you modal elements
+        const thankYouName = document.getElementById('thankYouName');
+        const thankYouPhone = document.getElementById('thankYouPhone');
+        const thankYouFolio = document.getElementById('thankYouFolio');
+        const thankYouPrize = document.getElementById('thankYouPrize');
+        const thankYouPrizeEmoji = document.getElementById('thankYouPrizeEmoji');
+        const confettiContainer = document.getElementById('confettiContainer');
+        
+        // Phone input validation
+        phoneInput.addEventListener('input', function(e) {
+            // Remove any non-numeric characters
+            this.value = this.value.replace(/[^0-9]/g, '');
+            
+            // Check if the input is valid
+            if (this.value.length > 0) {
+                // Show error if the input is not a number
+                if (!/^\d+$/.test(this.value)) {
+                    phoneInput.classList.add('input-error');
+                    phoneError.classList.add('visible');
+                } else {
+                    phoneInput.classList.remove('input-error');
+                    phoneError.classList.remove('visible');
+                }
+            } else {
+                phoneInput.classList.remove('input-error');
+                phoneError.classList.remove('visible');
+            }
+            
+            // Enforce maximum length (already set with maxlength attribute, but double-checking)
+            if (this.value.length > 13) {
+                this.value = this.value.slice(0, 13);
+            }
+        });
+        
+        // Create wheel sections with better centered emojis
+        function createWheel() {
+            wheel.innerHTML = '';
+            const totalSections = prizes.length;
+            const sectionAngle = 360 / totalSections;
+            
+            prizes.forEach((prize, index) => {
+                const section = document.createElement('div');
+                section.className = 'wheel-section';
+                section.style.transform = `rotate(${index * sectionAngle}deg)`;
+                section.style.background = prize.color;
+                
+                // Create a container for the emoji that will be properly positioned
+                const emojiContainer = document.createElement('div');
+                emojiContainer.className = 'wheel-emoji';
+                emojiContainer.textContent = prize.emoji;
+                
+                section.appendChild(emojiContainer);
+                wheel.appendChild(section);
+            });
+        }
+        
+        // Initialize wheel
+        createWheel();
+        
+        // Load participants data from localStorage
+        let participants = JSON.parse(localStorage.getItem('wheelParticipants')) || [];
+        
+        // Update recent winners list
+      function updateRecentWinners() {
+    const recentWinnersList = document.getElementById('recentWinnersList');
+    recentWinnersList.innerHTML = ''; // Limpiar lista
+
+    if (participants.length === 0) {
+        noWinnersMessage.classList.remove('hidden');
+        return;
+    }
+
+    noWinnersMessage.classList.add('hidden');
+    
+    // Obtener el último ganador
+    const lastWinner = participants[participants.length - 1];
+    const prizeInfo = prizes.find(p => p.name === lastWinner.prize);
+    const emoji = prizeInfo ? prizeInfo.emoji : '🎁';
+
+    // Mostrar solo el último ganador
+    const winnerCard = document.createElement('div');
+    winnerCard.className = 'winner-card';
+    winnerCard.innerHTML = `
+        <div>
+            <strong class="text-lg">${lastWinner.fullName}</strong>
+            <div class="text-sm text-gray-300">Premio: ${lastWinner.prize}</div>
+            <div class="text-sm text-gray-300">Folio: ${lastWinner.folio}</div>
+        </div>
+        <div class="winner-emoji">${emoji}</div>
+    `;
+    recentWinnersList.appendChild(winnerCard);
+}
+        
+        // Update participants list in admin panel
+        function updateParticipantsList() {
+            participantsList.innerHTML = '';
+            
+            if (participants.length === 0) {
+                participantsList.innerHTML = '<p class="text-gray-400">No hay participantes registrados</p>';
+                return;
+            }
+            
+            participants.forEach((participant, index) => {
+                const item = document.createElement('div');
+                item.className = 'bg-gray-800 p-4 rounded-lg';
+                
+                const prizeInfo = prizes.find(p => p.name === participant.prize);
+                const emoji = prizeInfo ? prizeInfo.emoji : '🎁';
+                
+                item.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <strong class="text-lg">${index + 1}. ${participant.fullName}</strong>
+                            <div class="text-sm text-gray-300">Folio: ${participant.folio}</div>
+                            <div class="text-sm text-gray-300">Tel: ${participant.phone}</div>
+                            <div class="text-sm text-gray-300">Premio: ${participant.prize}</div>
+                        </div>
+                        <div class="text-4xl">${emoji}</div>
+                    </div>
+                `;
+                
+                participantsList.appendChild(item);
+            });
+        }
+        
+        // Check if phone number already exists
+        function isPhoneNumberRegistered(phone) {
+            return participants.some(p => p.phone === phone);
+        }
+        
+        // Switch between views
+        function switchToWheelView() {
+            registrationView.classList.remove('active');
+            setTimeout(() => {
+                registrationView.style.display = 'none';
+                wheelView.style.display = 'block';
+                setTimeout(() => {
+                    wheelView.classList.add('active');
+                }, 50);
+            }, 500);
+        }
+        
+        function switchToRegistrationView() {
+            wheelView.classList.remove('active');
+            setTimeout(() => {
+                wheelView.style.display = 'none';
+                registrationView.style.display = 'block';
+                setTimeout(() => {
+                    registrationView.classList.add('active');
+                }, 50);
+            }, 500);
+        }
+        
+        // Initialize views
+        wheelView.style.display = 'none';
+        
+        // Get current folio number
+        function getCurrentFolio() {
+            const lastFolio = localStorage.getItem('lastFolio') || '0000';
+            return lastFolio;
+        }
+        
+        // Generate next folio number
+        function getNextFolio() {
+            const currentFolio = parseInt(getCurrentFolio(), 10);
+            const nextFolio = (currentFolio + 1).toString().padStart(4, '0');
+            localStorage.setItem('lastFolio', nextFolio);
+            return nextFolio;
+        }
+        
+        // Create confetti effect
+        function createConfetti() {
+            confettiContainer.innerHTML = '';
+            const colors = ['#ff5bff', '#00c3ff', '#00ffa3', '#ffdd00', '#ff3366'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+                confetti.style.animationDelay = Math.random() * 5 + 's';
+                confettiContainer.appendChild(confetti);
+            }
+        }
+        
+        // Register new participant
+        registerBtn.addEventListener('click', function() {
+            const fullName = fullNameInput.value.trim();
+            const phone = phoneInput.value.trim();
+            
+            if (!fullName || !phone) {
+                alert('Por favor, completa todos los campos');
+                return;
+            }
+            
+            // Validate phone number
+            if (!/^\d+$/.test(phone)) {
+                phoneInput.classList.add('input-error');
+                phoneError.classList.add('visible');
+                return;
+            }
+            
+            if (isPhoneNumberRegistered(phone)) {
+                alert('Este número de teléfono ya ha sido registrado');
+                return;
+            }
+            
+            // Generate folio number
+            const folio = getNextFolio();
+            folioDisplay.textContent = `Folio: ${folio}`;
+            
+            // Show loading screen briefly
+            const loadingScreen = document.getElementById('loadingScreen');
+            loadingScreen.style.display = 'flex';
+            loadingScreen.style.opacity = '1';
+            
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    // Switch to wheel view
+                    switchToWheelView();
+                }, 500);
+            }, 1000);
+        });
+        
+        // Spin the wheel
+        let spinning = false;
+        spinBtn.addEventListener('click', function() {
+            if (spinning) return;
+            
+            spinning = true;
+            spinBtn.disabled = true;
+            
+            // Determine the winning prize based on probabilities
+            const random = Math.random();
+            let cumulativeProbability = 0;
+            let winningPrize;
+            
+            for (const prize of prizes) {
+                cumulativeProbability += prize.probability;
+                if (random < cumulativeProbability) {
+                    winningPrize = prize;
+                    break;
+                }
+            }
+            
+            // Calculate rotation
+            const totalSections = prizes.length;
+            const sectionAngle = 360 / totalSections;
+            const winningIndex = prizes.indexOf(winningPrize);
+            
+            // Calculate the rotation to make the winning section land at the top
+            // We add 1800 degrees (5 full rotations) to make it spin multiple times
+            const rotation = 1800 + (360 - (winningIndex * sectionAngle));
+            
+            // Apply rotation
+            wheel.style.transform = `rotate(${rotation}deg)`;
+            
+            // Wait for the wheel to stop spinning
+            setTimeout(() => {
+                // Show result
+                prizeResult.textContent = `${winningPrize.emoji} ${winningPrize.name}`;
+                resultContainer.classList.remove('hidden');
+                
+                // Save participant data
+                const fullName = fullNameInput.value.trim();
+                const phone = phoneInput.value.trim();
+                const folio = folioDisplay.textContent.replace('Folio: ', '');
+                
+                const participant = {
+                    fullName,
+                    phone,
+                    prize: winningPrize.name,
+                    folio,
+                    date: new Date().toISOString()
+                };
+                
+                participants.push(participant);
+                localStorage.setItem('wheelParticipants', JSON.stringify(participants));
+                
+                // Update recent winners
+                updateRecentWinners();
+                
+                // Update thank you modal with participant details
+                thankYouName.textContent = fullName;
+                thankYouPhone.textContent = phone;
+                thankYouFolio.textContent = folio;
+                thankYouPrize.textContent = winningPrize.name;
+                thankYouPrizeEmoji.textContent = winningPrize.emoji;
+                
+                // Create confetti effect
+                createConfetti();
+                
+                // Show thank you modal after a short delay
+                setTimeout(() => {
+                    thankYouModal.classList.add('active');
+                }, 1500);
+                
+                spinning = false;
+            }, 5000);
+        });
+        
+        // New player button
+        newPlayerBtn.addEventListener('click', function() {
+            resultContainer.classList.add('hidden');
+            fullNameInput.value = '';
+            phoneInput.value = '';
+            wheel.style.transform = 'rotate(0deg)';
+            switchToRegistrationView();
+        });
+        
+        // Admin button
+        adminBtn.addEventListener('click', function() {
+            adminModal.classList.add('active');
+        });
+        
+        // Close admin modal
+        closeAdminModal.addEventListener('click', function() {
+            adminModal.classList.remove('active');
+        });
+        
+        // Admin login
+        adminLoginBtn.addEventListener('click', function() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (username === 'VERONICAVENTURAS' && password === 'Arbol1234@') {
+                adminModal.classList.remove('active');
+                adminPanelModal.classList.add('active');
+                updateParticipantsList();
+            } else {
+                alert('Usuario o contraseña incorrectos');
+            }
+        });
+        
+        // Close admin panel modal
+        closeAdminPanelModal.addEventListener('click', function() {
+            adminPanelModal.classList.remove('active');
+        });
+        
+        // Print list
+        printListBtn.addEventListener('click', function() {
+            window.print();
+        });
+        
+        // Clear data
+        clearDataBtn.addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que deseas borrar todos los datos? Esta acción no se puede deshacer.')) {
+                participants = [];
+                localStorage.setItem('wheelParticipants', JSON.stringify(participants));
+                localStorage.setItem('lastFolio', '0000');
+                updateParticipantsList();
+                updateRecentWinners();
+                alert('Todos los datos han sido borrados');
+            }
+        });
+        
+        // Close thank you modal
+        closeThankYouModal.addEventListener('click', function() {
+            thankYouModal.classList.remove('active');
+            spinBtn.disabled = false;
+        });
+        
+        // Initialize recent winners list
+        updateRecentWinners();
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === adminModal) {
+                adminModal.classList.remove('active');
+            }
+            if (event.target === adminPanelModal) {
+                adminPanelModal.classList.remove('active');
+            }
+            if (event.target === thankYouModal) {
+                thankYouModal.classList.remove('active');
+                spinBtn.disabled = false;
+            }
+        });
+    });
+
+ </script>
+</body>
+</html>
